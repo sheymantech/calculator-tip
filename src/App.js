@@ -1,68 +1,94 @@
-import { useState } from "react";
+const initialFriends = [
+  {
+    id: 118836,
+    name: "Clark",
+    image: "https://i.pravatar.cc/48?u=118836",
+    balance: -7,
+  },
+  {
+    id: 933372,
+    name: "Sarah",
+    image: "https://i.pravatar.cc/48?u=933372",
+    balance: 20,
+  },
+  {
+    id: 499476,
+    name: "Anthony",
+    image: "https://i.pravatar.cc/48?u=499476",
+    balance: 0,
+  },
+];
 
 export default function App() {
-  const [bill, setBill] = useState(0);
-  const [addonBill, setAddonBill] = useState("disatisfield");
-  const [addonFriendBill, setAddonFriendBill] = useState("disatisfield");
-  let totalBill;
-  let totalFreindBill;
-  if (addonBill === "disatisfield") totalBill = 0;
-  if (addonBill === "okay") totalBill = 5;
-  if (addonBill === "good") totalBill = 10;
-  if (addonBill === "amazing") totalBill = 20;
-
-  if (addonFriendBill === "disatisfield") totalFreindBill = 0;
-  if (addonFriendBill === "okay") totalFreindBill = 5;
-  if (addonFriendBill === "good") totalFreindBill = 10;
-  if (addonFriendBill === "amazing") totalFreindBill = 20;
   return (
-    <div>
-      <Bill bill={bill} setBill={setBill} />
-      <AddonBill addonBill={addonBill} setAddonBill={setAddonBill}>
-        <p>how did you like ther service?</p>
-      </AddonBill>
-      <AddonBill addonBill={addonFriendBill} setAddonBill={setAddonFriendBill}>
-        <p>how did your freind like the service?</p>
-      </AddonBill>
-      <Balance
-        bill={+bill}
-        totalBill={+totalBill}
-        totalFreindBill={+totalFreindBill}
-      ></Balance>
-      <Reset></Reset>
+    <div className="app">
+      <div className="sidebar">
+        <FriendList />
+        <FormAddFriend />
+        <Button>Add friend</Button>
+      </div>
     </div>
   );
 }
 
-function Bill({ bill, setBill }) {
+function FriendList() {
+  const friends = initialFriends;
   return (
-    <div>
-      <span>How much was the bill?</span>
-      <input value={bill} onChange={(e) => setBill(e.target.value)} />
-    </div>
+    <ul>
+      {friends.map((friend) => (
+        <Friend friend={friend} key={friend.id} />
+      ))}
+    </ul>
   );
 }
-function AddonBill({ addonBill, setAddonBill, children }) {
+
+function Friend({ friend }) {
   return (
-    <div>
-      <span>{children}</span>
-      <select value={addonBill} onChange={(e) => setAddonBill(e.target.value)}>
-        <option value="disatisfield">Disatisfield(0%)</option>
-        <option value="okay">it was okay(5%)</option>
-        <option value="good">it was good(10%)</option>
-        <option value="amazing">Absolutely amazing(20%)</option>
-      </select>
-    </div>
+    <li>
+      <img src={friend.image} alt={friend.name} />
+      <h3>{friend.name}</h3>
+
+      {friend.balance < 0 && (
+        <p className="red">
+          You owe {friend.name} ${Math.abs(friend.balance)}
+        </p>
+      )}
+
+      {friend.balance > 0 && (
+        <p className="green">
+          Your friend owes you ${Math.abs(friend.balance)}
+        </p>
+      )}
+
+      {friend.balance === 0 && <p> You and {friend.name} are even</p>}
+
+      <Button>Select</Button>
+    </li>
   );
 }
-function Balance({ bill, totalBill, totalFreindBill }) {
-  const averageTotal = (totalBill + totalFreindBill) / 2;
+
+function Button({ children }) {
+  return <button className="button">{children}</button>;
+}
+
+function FormAddFriend() {
   return (
-    <div>
-      <strong>
-        YOU PAY ${bill + averageTotal} (${bill} + ${averageTotal} tip)
-      </strong>
-    </div>
+    <form className="form-add-friend">
+      <label>friend name</label>
+      <input type="text" />
+
+      <label>image URL</label>
+      <input type="text" />
+
+      <Button>Add</Button>
+    </form>
   );
 }
-function Reset() {}
+
+function FormSliptBill() {
+  return (
+    <form className="form-split-bill">
+      <h2>split a bill with</h2>
+    </form>
+  );
+}
