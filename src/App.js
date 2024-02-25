@@ -24,7 +24,8 @@ const initialFriends = [
 export default function App() {
   const [showAddFriend, setShowAddFriend] = useState(false);
 
-  const [friends, setFriends] = useState([]);
+  const [friends, setFriends] = useState(initialFriends);
+  const [selectedFriend, setSelectedFriend] = useState(null);
 
   function handleShowAddFriend() {
     setShowAddFriend((addFriend) => !addFriend);
@@ -35,33 +36,49 @@ export default function App() {
     setShowAddFriend(false);
   }
 
+  function handleSelection(friend) {
+    setSelectedFriend(friend);
+  }
+
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendList friends={friends} />
+        <FriendList
+          friends={friends}
+          onSelection={handleSelection}
+          selectedFriend={selectedFriend}
+        />
+
         {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
+
         <Button onClick={handleShowAddFriend}>
           {showAddFriend ? "close" : "Add Friend"}
         </Button>
       </div>
-      <FormSliptBill />
+      {selectedFriend && <FormSliptBill selectedFriend={selectedFriend} />}
     </div>
   );
 }
 
-function FriendList({ friends }) {
+function FriendList({ friends, onSelection, selectedFriend }) {
   return (
     <ul>
       {friends.map((friend) => (
-        <Friend friend={friend} key={friend.id} />
+        <Friend
+          friend={friend}
+          key={friend.id}
+          onSelection={onSelection}
+          selectedFriend={selectedFriend}
+        />
       ))}
     </ul>
   );
 }
 
-function Friend({ friend }) {
+function Friend({ friend, onSelection, selectedFriend }) {
+  const isSelected = selectedFriend.id === friend.id;
   return (
-    <li>
+    <li className={isSelected ? "selected" : ""}>
       <img src={friend.image} alt={friend.name} />
       <h3>{friend.name}</h3>
 
@@ -79,7 +96,9 @@ function Friend({ friend }) {
 
       {friend.balance === 0 && <p> You and {friend.name} are even</p>}
 
-      <Button>Select</Button>
+      <Button onClick={() => onSelection(friend)}>
+        {isSelected ? "close" : "select"}
+      </Button>
     </li>
   );
 }
@@ -101,6 +120,7 @@ function FormAddFriend({ onAddFriend }) {
     if (!name || !image) return;
     const id = crypto.randomUUID();
     const newFriend = {
+      id,
       name,
       image: `${image}?=${id}`,
       balance: 0,
@@ -130,10 +150,10 @@ function FormAddFriend({ onAddFriend }) {
   );
 }
 
-function FormSliptBill() {
+function FormSliptBill({ selectedFriend }) {
   return (
     <form className="form-split-bill">
-      <h2>split a bill with</h2>
+      <h2>split a bill with {selectedFriend.name}</h2>
 
       <label>💤Bill value</label>
       <input type="text" />
@@ -141,7 +161,7 @@ function FormSliptBill() {
       <label>🔰Your Expenses</label>
       <input type="text" />
 
-      <label>🔰x's expenses</label>
+      <label>🔰{selectedFriend.name}'s expenses</label>
       <input type="text" disabled />
 
       <label>🔰 who is paying the bill</label>
