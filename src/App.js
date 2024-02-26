@@ -42,7 +42,14 @@ export default function App() {
   }
 
   function handleSplitBill(value) {
-    console.log(value);
+    setFriends((friends) =>
+      friends.map((friend) =>
+        friend.id === selectedFriend.id
+          ? { ...friend, balance: friend.balance + value }
+          : friend
+      )
+    );
+    setSelectedFriend(null);
   }
 
   return (
@@ -201,7 +208,7 @@ function FormSliptBill({ selectedFriend, onSplitBill }) {
         onChange={(e) => setWhoIsPaying(e.target.value)}
       >
         <option value="user">You</option>
-        <option value="friend">x</option>
+        <option value="friend">Your Friend</option>
       </select>
 
       <Button>Split Bill</Button>
